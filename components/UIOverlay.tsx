@@ -13,7 +13,7 @@ interface UIOverlayProps {
 export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUpload, hasPhotos, uploadedPhotos, isSharedView }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -36,10 +36,32 @@ export const UIOverlay: React.FC<UIOverlayProps> = ({ mode, onToggle, onPhotosUp
       readers.push(promise);
     }
 
-    Promise.all(readers).then((urls) => {
+    try {
+      const dataUrls = await Promise.all(readers);
+
+      // Upload to server
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ images: dataUrls }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const { imageUrls } = await response.json();
+
       // Append new photos to existing ones
-      onPhotosUpload([...uploadedPhotos, ...urls]);
-    });
+      onPhotosUpload([...uploadedPhotos, ...imageUrls]);
+    } catch (error) {
+      console.error('Upload error:', error);
+      // Fallback to local data URLs if upload fails
+      const dataUrls = await Promise.all(readers);
+      onPhotosUpload([...uploadedPhotos, ...dataUrls]);
+    }
 
     // Reset input so the same file can be selected again
     if (fileInputRef.current) {
