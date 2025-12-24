@@ -1,19 +1,18 @@
-
-import React, { useState, Suspense, useRef, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Loader } from '@react-three/drei';
-import { Experience } from './components/Experience';
-import { UIOverlay } from './components/UIOverlay';
-import { TreeMode } from './types';
+import React, { useState, Suspense, useRef, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Loader } from "@react-three/drei";
+import { Experience } from "./components/Experience";
+import { UIOverlay } from "./components/UIOverlay";
+import { TreeMode } from "./types";
 
 // Default photos to display on the tree
 const DEFAULT_PHOTOS = [
-  '/photos/z7360734546167_92e3622f1ec1cdc5ced46906d6c7d0c4.jpg',
-  '/photos/z7360734556376_a03660e9dd0311a54f35d7e4e105a9e5.jpg',
-  '/photos/z7360734559888_2607fa1d666d0c2af1991db994c39d48.jpg',
-  '/photos/z7360734570227_51887180340024d69a745bfb751047f7.jpg',
-  '/photos/z7360734593516_ff4cb9a9d4f9bc14bd421215be9c268a.jpg',
-  '/photos/z7360734600235_747c8adacb18625f5355c945c84ebafc.jpg',
+  "/photos/z7360734546167_92e3622f1ec1cdc5ced46906d6c7d0c4.jpg",
+  "/photos/z7360734556376_a03660e9dd0311a54f35d7e4e105a9e5.jpg",
+  "/photos/z7360734559888_2607fa1d666d0c2af1991db994c39d48.jpg",
+  "/photos/z7360734570227_51887180340024d69a745bfb751047f7.jpg",
+  "/photos/z7360734593516_ff4cb9a9d4f9bc14bd421215be9c268a.jpg",
+  "/photos/z7360734600235_747c8adacb18625f5355c945c84ebafc.jpg",
 ];
 
 // Simple Error Boundary to catch 3D resource loading errors (like textures)
@@ -25,7 +24,10 @@ interface ErrorBoundaryState {
   hasError: boolean;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -46,8 +48,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 text-[#D4AF37] font-serif p-8 text-center">
           <div>
             <h2 className="text-2xl mb-2">Something went wrong</h2>
-            <p className="opacity-70">A resource failed to load (likely a missing image). Check the console for details.</p>
-            <button 
+            <p className="opacity-70">
+              A resource failed to load (likely a missing image). Check the
+              console for details.
+            </p>
+            <button
               onClick={() => this.setState({ hasError: false })}
               className="mt-4 px-4 py-2 border border-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-colors"
             >
@@ -64,7 +69,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 export default function App() {
   const [mode, setMode] = useState<TreeMode>(TreeMode.FORMED);
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(DEFAULT_PHOTOS);
+  const [uploadedPhotos, setUploadedPhotos] =
+    useState<string[]>(DEFAULT_PHOTOS);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -72,23 +78,27 @@ export default function App() {
   useEffect(() => {
     const handleFirstInteraction = () => {
       if (audioRef.current) {
-        audioRef.current.play().catch(err => {
-          console.log('Audio autoplay prevented:', err);
+        audioRef.current.play().catch((err) => {
+          console.log("Audio autoplay prevented:", err);
         });
       }
     };
 
-    document.addEventListener('click', handleFirstInteraction, { once: true });
-    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+    document.addEventListener("click", handleFirstInteraction, { once: true });
+    document.addEventListener("touchstart", handleFirstInteraction, {
+      once: true,
+    });
 
     return () => {
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener("click", handleFirstInteraction);
+      document.removeEventListener("touchstart", handleFirstInteraction);
     };
   }, []);
 
   const toggleMode = () => {
-    setMode((prev) => (prev === TreeMode.FORMED ? TreeMode.CHAOS : TreeMode.FORMED));
+    setMode((prev) =>
+      prev === TreeMode.FORMED ? TreeMode.CHAOS : TreeMode.FORMED
+    );
   };
 
   const handlePhotosUpload = (photos: string[]) => {
@@ -106,10 +116,10 @@ export default function App() {
   return (
     <div className="w-full h-screen relative bg-gradient-to-b from-black via-[#001a0d] to-[#0a2f1e]">
       {/* Background Music - Auto-plays on first click */}
-      <audio 
-        ref={audioRef} 
-        src="/music/Last_Christmas.mp3" 
-        loop 
+      <audio
+        ref={audioRef}
+        src="/music/Last_Christmas.mp3"
+        loop
         preload="auto"
       />
 
@@ -121,22 +131,26 @@ export default function App() {
           shadows
         >
           <Suspense fallback={null}>
-            <Experience mode={mode} uploadedPhotos={uploadedPhotos} onPhotoClick={handlePhotoClick} />
+            <Experience
+              mode={mode}
+              uploadedPhotos={uploadedPhotos}
+              onPhotoClick={handlePhotoClick}
+            />
           </Suspense>
         </Canvas>
       </ErrorBoundary>
-      
-      <Loader 
-        containerStyles={{ background: '#000' }} 
-        innerStyles={{ width: '300px', height: '10px', background: '#333' }}
-        barStyles={{ background: '#D4AF37', height: '10px' }}
-        dataStyles={{ color: '#D4AF37', fontFamily: 'Cinzel' }}
+
+      <Loader
+        containerStyles={{ background: "#000" }}
+        innerStyles={{ width: "300px", height: "10px", background: "#333" }}
+        barStyles={{ background: "#D4AF37", height: "10px" }}
+        dataStyles={{ color: "#D4AF37", fontFamily: "Cinzel" }}
       />
-      
-      <UIOverlay 
-        mode={mode} 
-        onToggle={toggleMode} 
-        onPhotosUpload={handlePhotosUpload} 
+
+      <UIOverlay
+        mode={mode}
+        onToggle={toggleMode}
+        onPhotosUpload={handlePhotosUpload}
         hasPhotos={uploadedPhotos.length > 0}
         uploadedPhotos={uploadedPhotos}
         isSharedView={false}
@@ -144,27 +158,30 @@ export default function App() {
 
       {/* Photo Popup Modal */}
       {selectedPhoto && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer animate-fade-in"
           onClick={closePhotoPopup}
         >
           {/* Polaroid frame with photo */}
-          <div 
+          <div
             className="relative transform transition-all duration-300 ease-out animate-scale-in cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Polaroid container */}
-            <div className="bg-white p-4 pb-8 shadow-2xl" style={{ width: '70vmin', maxWidth: '700px' }}>
+            <div
+              className="bg-white px-1 py-4 pb-8 shadow-2xl"
+              style={{ width: "85vmin", maxWidth: "700px" }}
+            >
               {/* Gold clip at top */}
               <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-6 bg-gradient-to-b from-[#D4AF37] to-[#C5A028] rounded-sm shadow-lg"></div>
-              
+
               {/* Photo */}
-              <img 
-                src={selectedPhoto} 
-                alt="Selected Memory" 
-                className="w-full aspect-square object-cover"
+              <img
+                src={selectedPhoto}
+                alt="Selected Memory"
+                className="w-full aspect-square object-contain"
               />
-              
+
               {/* Text label */}
               <div className="text-center mt-4 font-serif text-gray-700 text-lg">
                 Happy Memories ✨
@@ -184,4 +201,3 @@ export default function App() {
     </div>
   );
 }
-
